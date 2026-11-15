@@ -113,16 +113,31 @@ app.include_router(api_router)
 
 @app.get("/health", tags=["health"])
 def health() -> dict:
-    """Liveness + DB connectivity probe."""
+    """
+    Liveness + DB connectivity probe.
+
+    Returns HTTP 200 ONLY if the database is reachable.
+    Returns HTTP 503 if DB is unreachable — so Docker healthchecks
+    (which use `curl -f`) correctly detect failure.
+    """
+    from fastapi import HTTPException, status as http_status
     from sqlalchemy import text
     from backend.app.database import SessionLocal
+
     try:
         with SessionLocal() as db:
             db.execute(text("SELECT 1"))
         return {"status": "ok", "database": "ok", "env": settings.environment}
     except Exception as exc:  # noqa: BLE001
-        logger.exception("Health check failed")
-        return {"status": "degraded", "database": "unreachable", "error": str(exc)}
+        logger.exception("Health check failed: %s", exc)
+        raise HTTPException(
+            status_code=http_status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "status": "unhealthy",
+                "database": "unreachable",
+                "error": str(exc),
+            },
+        ) from exc
 
 
 @app.get("/", tags=["root"])
