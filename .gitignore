@@ -1,0 +1,44 @@
+# Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local DBs
+*.sqlite
+*.sqlite3
+
+# Generated data exports (regenerable from seed)
+data-generator/exports/*.csv
+data-generator/exports/*.json
+
+# EXCEPTION: ground truth is source-of-truth, keep it versioned
+!data-generator/ground_truth/
+!data-generator/ground_truth/ground_truth.csv
