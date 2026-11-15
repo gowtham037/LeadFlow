@@ -1,7 +1,7 @@
 # LeadFlow: Lead Intelligence & Opportunity Management Platform
 
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)]()
-[![Tests](https://img.shields.io/badge/Tests-114%20Passed-success)]()
+[![Tests](https://img.shields.io/badge/Tests-116%20Passed-success)]()
 [![Validation](https://img.shields.io/badge/Validation-19%2F19%20Checks-brightgreen)]()
 [![Conversion Lift](https://img.shields.io/badge/Conversion%20Lift-23x-blue)]()
 [![Python](https://img.shields.io/badge/Python-3.12-blue)]()
@@ -72,11 +72,9 @@ When `docker compose up --build -d` runs for the first time on a fresh database,
 | Document | Description |
 | :--- | :--- |
 | [**ARCHITECTURE.md**](ARCHITECTURE.md) | System Architecture: Component diagrams, data flows, engine responsibilities, security model. |
-| [**DESIGN_DECISIONS.md**](DESIGN_DECISIONS.md) | Engineering Rationale: Deterministic scoring, immutable history, ground truth isolation, savepoint validation. |
-| [**TESTING.md**](TESTING.md) | Automated Test Evidence: Catalog of 114 automated tests, execution logs, coverage matrix. |
 | [**DEMO_GUIDE.md**](DEMO_GUIDE.md) | Evaluator Walkthrough: 5-minute step-by-step demo script and Q&A. |
-| [**docs/validation-report.md**](docs/validation-report.md) | Auto-generated 19/19 data quality checks with severity. |
-| [**docs/final_submission_audit.md**](docs/final_submission_audit.md) | Formal Verification Audit: Line-by-line requirement checklist. |
+| [**VALIDATION_REPORT.md**](VALIDATION_REPORT.md) | Auto-generated 19/19 data quality checks with severity. |
+| [**FINAL_SUBMISSION_AUDIT.md**](FINAL_SUBMISSION_AUDIT.md) | Formal Verification Audit: Line-by-line requirement checklist. |
 
 ---
 
@@ -98,13 +96,13 @@ Once `docker compose up --build -d` completes and services are healthy:
 
 ### 🧪 Automated Test Suite Execution
 
-Run the complete backend test suite (89 tests) inside the isolated container:
+Run the complete backend test suite (91 tests) inside the isolated container:
 
 ```bash
 docker compose exec backend pytest backend/tests/ -q
 ```
 
-**Expected: 89 passed in ~3s.**
+**Expected: 91 passed in ~3s.**
 
 Run E2E browser tests (requires both backend + frontend running):
 
@@ -163,7 +161,9 @@ docker compose down -v
 
 The system is strictly **explainable**, **deterministic**, **traceable**, and **fully executable**. Every lead score is backed by 12 documented feature-level contributions, every assignment records the routing decision trace, every task enforces per-channel consent, and negative data scenarios are surfaced — never silently fixed.
 
-**Proven business impact:** The scoring engine segments leads into 4 tiers, and HOT leads convert at **54.5%** vs COLD at **2.3%** — a **23x lift** that validates the prioritization strategy.
+**Scoring strategy evaluation (synthetic demo):** The scoring engine segments leads into 4 tiers. In this synthetic dataset, HOT leads show a **54.5%** conversion rate vs COLD at **2.3%**.
+
+> ⚠️ **Honest caveat:** This lift is a workflow demonstration, not predictive evidence. The synthetic generator intentionally correlates lead category with conversion outcome by design. A proper evaluation with independent features and held-out data is required to claim real predictive lift. See `analytics/evaluate_scoring.py` (documented methodology) and `FINAL_SUBMISSION_AUDIT.md` (finding 9).
 
 ---
 
@@ -243,7 +243,7 @@ flowchart TB
 - **Backend**: Python 3.12, FastAPI 0.115, Pydantic v2, Uvicorn, SQLAlchemy 2.0 ORM, psycopg2.
 - **Database**: PostgreSQL 16 (containerized).
 - **Data Engineering**: Faker (seed `20261022`), Python standard libraries.
-- **Testing**: Pytest 8.3 (89 backend) + Playwright 1.65 (25 E2E) = **114 total**.
+- **Testing**: Pytest 8.3 (91 backend) + Playwright 1.65 (25 E2E) = **114 total**.
 - **Frontend**: React 19, TypeScript 5.7, Vite 6, TailwindCSS, Lucide, Recharts, Axios.
 - **Deployment**: Docker & Docker Compose, Nginx reverse proxy, multi-stage builds.
 - **Auth**: JWT (HS256) + bcrypt password hashing.
@@ -473,7 +473,9 @@ docker compose exec backend python -m backend.app.validation.validator
 | NURTURE | 10,051 | 1,243 | 12.4% | 245 | $11.5M |
 | **COLD** | 5,177 | 120 | **2.3%** | 24 | $1.1M |
 
-**HOT converts at 23x the rate of COLD.** This validates the entire prioritization strategy.
+**HOT converts at 23x the rate of COLD in this synthetic dataset.**
+
+> ⚠️ **Caveat:** This is a workflow illustration, not predictive evidence. See `FINAL_SUBMISSION_AUDIT.md` for details.
 
 ---
 
@@ -498,7 +500,7 @@ LeadFlow/
 │   │   ├── config.py
 │   │   ├── database.py
 │   │   └── main.py                  # FastAPI app + startup pipeline
-│   ├── tests/                       # 89 backend tests
+│   ├── tests/                       # 91 backend tests
 │   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/
@@ -513,9 +515,13 @@ LeadFlow/
 │   └── package.json
 ├── data/
 │   └── ground_truth/ground_truth.csv
-├── docs/
-│   ├── validation-report.md
-│   └── final_submission_audit.md
+├── (root-level documentation)
+│   ├── README.md
+│   ├── ARCHITECTURE.md
+│   ├── DEMO_GUIDE.md
+│   ├── FINAL_SUBMISSION_AUDIT.md
+│   ├── KNOWN_LIMITATIONS.md
+│   └── VALIDATION_REPORT.md
 ├── docker-compose.yml
 ├── .dockerignore
 ├── .env.example
@@ -551,7 +557,7 @@ SYNTHETIC_SEED=20261022
 **Backend tests (89) inside Docker:**
 ```bash
 docker compose exec backend pytest backend/tests/ -q
-# Expected: 89 passed in ~3s
+# Expected: 91 passed in ~3s
 ```
 
 **E2E tests (25) locally:**
@@ -639,5 +645,5 @@ Expected — the full pipeline (seed + score + route + task + opps) runs automat
 ---
 
 **Public Repository**: [https://github.com/gowtham037/LeadFlow](https://github.com/gowtham037/LeadFlow)  
-**Validation Report**: [docs/validation-report.md](docs/validation-report.md)  
-**Acceptance Criteria**: [docs/final_submission_audit.md](docs/final_submission_audit.md)
+**Validation Report**: [VALIDATION_REPORT.md](VALIDATION_REPORT.md)  
+**Acceptance Criteria**: [FINAL_SUBMISSION_AUDIT.md](FINAL_SUBMISSION_AUDIT.md)
