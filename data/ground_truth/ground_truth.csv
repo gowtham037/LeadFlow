@@ -1,0 +1,6 @@
+anomaly_id,anomaly_type,entity_type,entity_id,expected_behavior,actual_behavior,severity,injected_at
+EXC-2026-000001,optout_contacted,task,TASK-LEAD-2026-020001-001,No task created for leads with all consent channels revoked,Task TASK-LEAD-2026-020001-001 created for opted-out lead LEAD-2026-020001,critical,2026-11-06T02:35:52.813052
+EXC-2026-000002,post_conversion_scoring,activity,ACT-LEAD-2026-020002-999,Scoring engine only uses activities occurring before conversion,Activity ACT-LEAD-2026-020002-999 occurred 5 days AFTER conversion — violates cutoff,high,2026-11-06T02:35:52.813052
+EXC-2026-000003,territory_mismatch,lead,LEAD-2026-020003,Lead assigned to rep in territory 55,Lead assigned to rep in territory 53,high,2026-11-06T02:35:52.813052
+EXC-2026-000004,duplicate_opportunity,opportunity,OPP-2026-003002,One opportunity per unique prospect (contact+company),Opportunity OPP-2026-003002 duplicates OPP-2026-003001 on same contact+company,high,2026-11-06T02:35:52.813052
+EXC-2026-000005,stage_gap,opportunity,OPP-2026-003003,Stage history follows DISCOVERY → QUALIFICATION → PROPOSAL,Skipped QUALIFICATION: DISCOVERY → PROPOSAL directly,medium,2026-11-06T02:35:52.813052

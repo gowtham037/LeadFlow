@@ -42,3 +42,15 @@ data-generator/exports/*.json
 # EXCEPTION: ground truth is source-of-truth, keep it versioned
 !data-generator/ground_truth/
 !data-generator/ground_truth/ground_truth.csv
+
+# Playwright artifacts
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/.playwright/
+
+# Vite build
+frontend/dist/
+
+# Python venv (already there but double-check)
+.venv/
