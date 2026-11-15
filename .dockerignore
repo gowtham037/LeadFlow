@@ -1,0 +1,22 @@
+# Never copy into Docker build context
+.git/
+.gitignore
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/playwright-report/
+frontend/test-results/
+data/runtime_exports/
+data/exports/
+*.log
+.env
+.env.local
+data/ground_truth/ground_truth.csv.bak
+
+# But allow ground truth (needed at runtime for demo docs)
+!data/ground_truth/

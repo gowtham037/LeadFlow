@@ -47,8 +47,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
       interval: 15s
       timeout: 5s
-      start_period: 20s
-      retries: 5
+      start_period: 240s    # 4 min: full pipeline (seed 40s + score 90s + route 10s + tasks 15s + opps 10s) needs ~165s + slack
+      retries: 10           # 10 × 15s = 150s grace after start_period expires
 
   frontend:
     build:
