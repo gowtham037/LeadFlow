@@ -201,12 +201,20 @@ def advance_stage(
     Raises:
       - InvalidStageTransition if not strictly forward
       - ValueError if opportunity is already closed (won/lost)
+      - InvalidStageTransition if to_stage == CLOSED (must use close_won/close_lost)
 
     Writes immutable StageHistory row.
     """
     if opportunity.status in (OpportunityStatus.WON, OpportunityStatus.LOST):
         raise ValueError(
             f"Cannot advance stage: opportunity {opportunity.business_id} is already {opportunity.status.value}"
+        )
+
+    # NEW GUARD: CLOSED must go through close_won() or close_lost()
+    if to_stage == OpportunityStage.CLOSED:
+        raise InvalidStageTransition(
+            "Cannot advance directly to CLOSED. Use close_won() or close_lost() "
+            "to set the terminal outcome (won_reason or lost_reason)."
         )
 
     _validate_forward_transition(opportunity.stage, to_stage)

@@ -265,3 +265,19 @@ def test_stage_history_rows_written(db):
     assert history[0].to_stage == OpportunityStage.DISCOVERY
     assert history[-1].to_stage == OpportunityStage.CLOSED
 
+
+
+def test_advance_to_closed_rejected_in_engine(db):
+    """Regression for Finding 7: advance_stage must reject CLOSED."""
+    m = _seed(db)
+    lead = _lead(db, m)
+    opp = create_opportunity(db, lead).opportunity
+
+    with pytest.raises(InvalidStageTransition) as exc_info:
+        advance_stage(db, opp, OpportunityStage.CLOSED)
+
+    assert "close_won" in str(exc_info.value).lower() or "close_lost" in str(exc_info.value).lower()
+    # Stage must remain DISCOVERY
+    assert opp.stage == OpportunityStage.DISCOVERY
+    assert opp.status == OpportunityStatus.OPEN
+    assert opp.closed_at is None

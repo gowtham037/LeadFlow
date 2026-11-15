@@ -251,6 +251,16 @@ def advance_opp(
     if opp is None:
         raise HTTPException(status_code=404, detail=f"Opportunity {business_id} not found")
 
+    # Reject CLOSED at HTTP layer — must use /close endpoint
+    if body.to_stage == OpportunityStage.CLOSED:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Cannot advance to CLOSED. Use POST /close with {status: 'won'|'lost', "
+                "won_reason | lost_reason} to set the terminal outcome."
+            ),
+        )
+
     try:
         advance_stage(db, opp, body.to_stage, actor=f"user:{user.business_id}", notes=body.notes)
         db.commit()
