@@ -64,9 +64,45 @@ def on_startup() -> None:
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
         conn.commit()
 
-    # Create tables idempotently (no-op if Alembic already created them)
+    # Create tables idempotently
     Base.metadata.create_all(bind=engine)
     logger.info("Schema ensured. Tables: %s", ", ".join(sorted(Base.metadata.tables)))
+
+    # AUTO-SEED on first boot if database is empty
+    if settings.auto_seed_on_startup:
+        try:
+            from backend.app.database import SessionLocal
+            from backend.app.models.marketing import Lead
+            with SessionLocal() as db:
+                lead_count = db.query(Lead).count()
+                if lead_count == 0:
+                    logger.info("Empty database detected — auto-seeding full dataset (seed=%d)...", settings.data_gen_seed)
+                    from backend.app.data_generator.generate import run as run_generator
+                    counts = run_generator(mode=settings.data_gen_mode, seed=settings.data_gen_seed)
+                    logger.info("Auto-seed complete: %d leads generated", counts.get("leads", 0))
+
+                    # Run the full business pipeline so the demo is fully ready on first boot
+                    logger.info("Running scoring engine (this takes ~90s)...")
+                    from backend.app.engines.scoring.runner import rescore_all_leads
+                    rescore_all_leads(db)
+
+                    logger.info("Running routing engine...")
+                    from backend.app.engines.routing.runner import route_all_qualified_leads
+                    route_all_qualified_leads(db)
+
+                    logger.info("Running task engine...")
+                    from backend.app.engines.task_management.runner import generate_all_followup_tasks
+                    generate_all_followup_tasks(db)
+
+                    logger.info("Running opportunity engine...")
+                    from backend.app.engines.opportunity.runner import convert_all_eligible_leads
+                    convert_all_eligible_leads(db)
+
+                    logger.info("FULL PIPELINE COMPLETE — demo ready")
+                else:
+                    logger.info("Database already seeded (%d leads). Skipping auto-seed.", lead_count)
+        except Exception as exc:
+            logger.exception("Auto-seed failed (not fatal — server will start): %s", exc)
 
 
 # Mount all API routes
