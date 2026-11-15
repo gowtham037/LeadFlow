@@ -54,3 +54,4 @@ frontend/dist/
 
 # Python venv (already there but double-check)
 .venv/
+backend/requirements.txt.backup
