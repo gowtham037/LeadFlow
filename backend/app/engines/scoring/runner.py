@@ -53,17 +53,30 @@ def rescore_lead(
     rule: ScoreRule,
     cutoff_at: datetime | None = None,
 ) -> LeadScoreHistory:
-    """Re-score one lead at the given cutoff (default: now) and persist."""
-    cutoff = cutoff_at or datetime.now(timezone.utc)
+    """
+    Re-score one lead at the given cutoff (default: now) and persist.
 
-    features = extract_features(db, lead.id, cutoff)
+    CRITICAL: If the lead has already converted, the effective cutoff is
+    capped at `converted_at`. This prevents post-conversion activity from
+    leaking into the score of a converted lead (Finding 1 — technical review).
+    """
+    now = datetime.now(timezone.utc)
+    cutoff = cutoff_at or now
+
+    # Cap cutoff at conversion time for converted leads
+    if lead.converted_at is not None:
+        effective_cutoff = min(cutoff, lead.converted_at)
+    else:
+        effective_cutoff = cutoff
+
+    features = extract_features(db, lead.id, effective_cutoff)
     result = calculate_score(features, rule)
 
     history = LeadScoreHistory(
         lead_id=lead.id,
         rule_version=rule.version,
-        input_cutoff_at=cutoff,
-        scored_at=cutoff,
+        input_cutoff_at=effective_cutoff,
+        scored_at=effective_cutoff,
         fit_score=result.fit_score,
         intent_score=result.intent_score,
         engagement_score=result.engagement_score,
@@ -78,7 +91,7 @@ def rescore_lead(
     lead.current_score = result.total
     lead.current_score_category = result.category
     lead.current_score_version = rule.version
-    lead.last_scored_at = cutoff
+    lead.last_scored_at = effective_cutoff
 
     return history
 

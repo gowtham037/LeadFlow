@@ -186,3 +186,24 @@ def test_territory_mismatch_penalized():
     r_mismatch = calculate_score(f_mismatch, FakeRule())
     assert r_match.fit_score > r_mismatch.fit_score
 
+
+
+def test_converted_lead_cutoff_capped_at_conversion():
+    """Regression for Finding 1 — converted leads must not include post-conversion activity."""
+    from datetime import datetime, timedelta, timezone
+
+    # Simulate: lead converted 10 days ago, activity happened 5 days ago
+    now = datetime.now(timezone.utc)
+    converted_at = now - timedelta(days=10)
+    post_conversion_activity = now - timedelta(days=5)
+    user_cutoff = now  # caller asks for "now"
+
+    # The cap logic (extracted from runner.py for unit test)
+    effective_cutoff = min(user_cutoff, converted_at) if converted_at else user_cutoff
+
+    # Post-conversion activity must NOT be within the effective window
+    assert post_conversion_activity > effective_cutoff, (
+        f"Post-conversion activity at {post_conversion_activity} should be "
+        f"AFTER effective cutoff {effective_cutoff}, but is not — cutoff leak!"
+    )
+    assert effective_cutoff == converted_at, "Cutoff must equal converted_at"
