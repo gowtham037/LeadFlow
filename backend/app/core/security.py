@@ -30,7 +30,19 @@ def hash_password(plain: str) -> str:
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    """Verify a password against a bcrypt hash. Returns False on any error."""
+    """
+    Verify a password against a bcrypt hash. Returns False on any error.
+
+    Validates hash format BEFORE calling bcrypt.checkpw() — the underlying
+    Rust binding panics on malformed hashes (rather than raising a normal
+    exception), which crashes the pytest session.
+    """
+    # Basic format validation: bcrypt hashes start with $2a$ / $2b$ / $2y$ and are 59-60 chars
+    if not hashed or not hashed.startswith(("$2a$", "$2b$", "$2y$")):
+        return False
+    if len(hashed) < 59 or len(hashed) > 60:
+        return False
+
     try:
         raw = plain.encode("utf-8")
         if len(raw) > _BCRYPT_MAX_BYTES:
