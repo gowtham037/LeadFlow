@@ -2,7 +2,7 @@
 Organization domain — 5 master tables.
 
 Company, Contact, Territory, Product, SalesRep.
-Generated before transactional tables (parent-before-child per InsureFlow).
+Generated before transactional tables .
 """
 from __future__ import annotations
 

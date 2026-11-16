@@ -1,7 +1,7 @@
 """
 LeadFlow synthetic data generator.
 
-Deterministic seed: 20261022 (matches InsureFlow convention).
+Deterministic seed: 20261022 .
 Generates 20,000 leads + 10,000 contacts + 5,000 companies + 3,000 opportunities
 plus all supporting records. Injects the 5 mandatory anomaly scenarios into
 isolated records (is_baseline=False), preserving the baseline as 100% valid.

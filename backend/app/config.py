@@ -1,7 +1,7 @@
 """
 Application configuration — Pydantic Settings.
 
-Mirrors InsureFlow's config.py conventions:
+
 - Reads from environment variables (.env in local dev, docker-compose in containers)
 - Safe defaults embedded (zero host dependencies needed for evaluation)
 - Postgres-primary with SQLite fallback for tests / standalone execution
@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60
 
-    # --- Data generator (per InsureFlow: seed 20261022) ---
+    # --- Data generator  ---
     data_gen_seed: int = 20261022
     auto_seed_on_startup: bool = True
     data_gen_mode: Literal["starter", "full"] = "full"

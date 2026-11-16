@@ -1,6 +1,6 @@
 # ============================================================
 # LeadFlow — Backend dependencies
-# Python 3.12 · PostgreSQL 16 · mirrors InsureFlow stack
+# Python 3.12 · PostgreSQL 16 
 # ============================================================
 
 # --- Web framework ---
@@ -22,7 +22,7 @@ email-validator==2.2.0
 python-jose[cryptography]==3.3.0
 bcrypt==4.2.1
 
-# --- Data generator (per InsureFlow) ---
+# --- Data generator ---
 faker==33.1.0
 numpy==2.1.3
 

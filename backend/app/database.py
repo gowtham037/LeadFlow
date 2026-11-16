@@ -1,7 +1,7 @@
 """
 Database engine + session factory + declarative Base.
 
-Mirrors InsureFlow's resilient database.py:
+
 - Postgres primary (production / docker-compose)
 - SQLite fallback (tests, standalone runs) if Postgres unreachable
 - SQLAlchemy 2.0 declarative style
